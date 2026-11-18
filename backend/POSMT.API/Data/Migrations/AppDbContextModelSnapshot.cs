@@ -91,10 +91,15 @@ namespace POSMT.API.Data.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime>("PaidAt")
+                    b.Property<DateTime?>("PaidAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("PaymentStatus")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
@@ -107,7 +112,14 @@ namespace POSMT.API.Data.Migrations
                     b.HasIndex("SaleId")
                         .IsUnique();
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", t =>
+                        {
+                            t.HasCheckConstraint("CK_Payments_Amount", "[Amount] >= 0");
+
+                            t.HasCheckConstraint("CK_Payments_Method", "[PaymentMethod] IN ('Cash', 'Card')");
+
+                            t.HasCheckConstraint("CK_Payments_Status", "[PaymentStatus] IN ('Pending', 'Completed', 'Failed', 'Refunded')");
+                        });
                 });
 
             modelBuilder.Entity("POSMT.API.Models.Product", b =>
@@ -228,7 +240,9 @@ namespace POSMT.API.Data.Migrations
 
                     b.ToTable("Sales", t =>
                         {
-                            t.HasCheckConstraint("CK_Sales_Amounts", "[Subtotal] >= 0 AND [Discount] >= 0 AND [Discount] <= [Subtotal] AND [TotalAmount] >= 0");
+                            t.HasCheckConstraint("CK_Sales_Amounts", "[Subtotal] >= 0 AND [Discount] >= 0 AND [Discount] <= [Subtotal] AND [TotalAmount] = [Subtotal] - [Discount]");
+
+                            t.HasCheckConstraint("CK_Sales_Status", "[Status] IN ('Pending', 'Completed', 'Cancelled')");
                         });
                 });
 
@@ -265,7 +279,7 @@ namespace POSMT.API.Data.Migrations
 
                     b.ToTable("SaleItems", t =>
                         {
-                            t.HasCheckConstraint("CK_SaleItems_Quantity", "[Quantity] > 0");
+                            t.HasCheckConstraint("CK_SaleItems_Quantity", "[Quantity] > 0 AND [UnitPrice] >= 0 AND [LineTotal] >= 0 AND [LineTotal] = [Quantity] * [UnitPrice]");
                         });
                 });
 
@@ -292,7 +306,10 @@ namespace POSMT.API.Data.Migrations
                     b.HasIndex("TerminalName")
                         .IsUnique();
 
-                    b.ToTable("Terminals");
+                    b.ToTable("Terminals", t =>
+                        {
+                            t.HasCheckConstraint("CK_Terminals_Status", "[Status] IN ('Active', 'Inactive')");
+                        });
                 });
 
             modelBuilder.Entity("POSMT.API.Models.User", b =>
@@ -323,12 +340,17 @@ namespace POSMT.API.Data.Migrations
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TerminalId")
+                        .HasColumnType("int");
+
                     b.HasKey("UserId");
 
                     b.HasIndex("Email")
                         .IsUnique();
 
                     b.HasIndex("RoleId");
+
+                    b.HasIndex("TerminalId");
 
                     b.ToTable("Users");
                 });
@@ -412,7 +434,14 @@ namespace POSMT.API.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("POSMT.API.Models.Terminal", "Terminal")
+                        .WithMany("Users")
+                        .HasForeignKey("TerminalId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Role");
+
+                    b.Navigation("Terminal");
                 });
 
             modelBuilder.Entity("POSMT.API.Models.Category", b =>
@@ -442,6 +471,8 @@ namespace POSMT.API.Data.Migrations
             modelBuilder.Entity("POSMT.API.Models.Terminal", b =>
                 {
                     b.Navigation("Sales");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("POSMT.API.Models.User", b =>

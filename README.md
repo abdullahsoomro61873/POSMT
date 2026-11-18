@@ -12,4 +12,4 @@ A retail POS system where multiple cashier terminals share one product catalogue
 
 ## Status
 
-Phase 5B - JWT authentication and roles
+Phase 6A - Terminal Management APIs
