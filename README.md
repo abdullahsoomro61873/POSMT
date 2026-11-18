@@ -12,4 +12,4 @@ A retail POS system where multiple cashier terminals share one product catalogue
 
 ## Status
 
-Phase 1 - Frontend deployed to GitHub Pages
+Phase 2 - Requirements and database design
