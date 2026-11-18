@@ -12,4 +12,4 @@ A retail POS system where multiple cashier terminals share one product catalogue
 
 ## Status
 
-Phase 3 - Backend foundation (API, EF Core, SQL Server)
+Phase 4 - Category and Product APIs
