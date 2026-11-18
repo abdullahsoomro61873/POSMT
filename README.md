@@ -12,4 +12,4 @@ A retail POS system where multiple cashier terminals share one product catalogue
 
 ## Status
 
-Phase 4 - Category and Product APIs
+Phase 5A - Inventory APIs
