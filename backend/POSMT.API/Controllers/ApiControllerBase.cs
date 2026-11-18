@@ -13,6 +13,7 @@ public abstract class ApiControllerBase : ControllerBase
             ResultStatus.Success => Ok(result.Data),
             ResultStatus.NotFound => NotFound(new ProblemDetails { Title = result.Error, Status = 404 }),
             ResultStatus.Conflict => Conflict(new ProblemDetails { Title = result.Error, Status = 409 }),
+            ResultStatus.Unauthorized => Unauthorized(new ProblemDetails { Title = result.Error, Status = 401 }),
             _ => BadRequest(new ProblemDetails { Title = result.Error, Status = 400 })
         };
     }

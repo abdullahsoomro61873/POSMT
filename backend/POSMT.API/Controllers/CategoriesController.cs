@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using POSMT.API.DTOs;
 using POSMT.API.Interfaces;
+using POSMT.API.Models;
 using POSMT.API.Services;
 
 namespace POSMT.API.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 public class CategoriesController : ApiControllerBase
 {
@@ -27,6 +30,7 @@ public class CategoriesController : ApiControllerBase
         return ToResponse(await _service.GetByIdAsync(id));
     }
 
+    [Authorize(Roles = RoleNames.Manager)]
     [HttpPost]
     public async Task<IActionResult> Create(CategoryRequest request)
     {
@@ -38,12 +42,14 @@ public class CategoriesController : ApiControllerBase
         return CreatedAtAction(nameof(GetById), new { id = result.Data!.CategoryId }, result.Data);
     }
 
+    [Authorize(Roles = RoleNames.Manager)]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, CategoryRequest request)
     {
         return ToResponse(await _service.UpdateAsync(id, request));
     }
 
+    [Authorize(Roles = RoleNames.Manager)]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using POSMT.API.DTOs;
 using POSMT.API.Interfaces;
+using POSMT.API.Models;
 
 namespace POSMT.API.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 public class InventoryController : ApiControllerBase
 {
@@ -26,12 +29,14 @@ public class InventoryController : ApiControllerBase
         return ToResponse(await _service.GetByProductIdAsync(productId));
     }
 
+    [Authorize(Roles = RoleNames.Manager)]
     [HttpPost("{productId:int}/adjust")]
     public async Task<IActionResult> Adjust(int productId, StockAdjustRequest request)
     {
         return ToResponse(await _service.AdjustStockAsync(productId, request));
     }
 
+    [Authorize(Roles = RoleNames.Manager)]
     [HttpPut("{productId:int}/reorder-level")]
     public async Task<IActionResult> SetReorderLevel(int productId, ReorderLevelRequest request)
     {
