@@ -12,6 +12,9 @@ public static class DbSeeder
         
         await EnsureUserAsync(db, "Demo Cashier", "cashier@posmt.local",
         configuration["Seed:CashierPassword"], 2);
+
+        await EnsureUserAsync(db, "Test Cashier 2", "cashier2@posmt.local",
+        configuration["Seed:TestCashierPassword"], 2);
     }
 
     private static async Task EnsureUserAsync(AppDbContext db, string name, string email, string? password, int roleId)

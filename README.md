@@ -13,3 +13,4 @@ A retail POS system where multiple cashier terminals share one product catalogue
 ## Status
 
 Phase 6A - Terminal Management APIs
+Phase 6B - Sales Creation and Transaction Engine
